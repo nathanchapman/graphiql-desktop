@@ -166,7 +166,7 @@ export default class MenuBuilder {
           label: 'GraphiQL Desktop Docs',
           click() {
             shell.openExternal(
-              'https://github.com/electron/nathanchapman/graphiql-desktop#readme'
+              'https://github.com/nathanchapman/graphiql-desktop#readme'
             );
           },
         },
