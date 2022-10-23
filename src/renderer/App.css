@@ -13,14 +13,12 @@ body {
 
 .graphiql-desktop {
   background: #ffffff;
-  /* height: calc(100vh - 41px); */
   display: flex;
   flex-flow: column;
   height: 100vh;
   overflow: hidden;
 }
 
-/* TODO: Figure out height and width for these */
 .graphiql-desktop-url-input {
   margin: 2px 0 0px 60px;
   width: calc(100vw - 100px);

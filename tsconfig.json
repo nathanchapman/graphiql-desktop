@@ -1,19 +1,20 @@
 {
   "compilerOptions": {
-    "incremental": true,
-    "target": "es2021",
-    "module": "commonjs",
-    "lib": ["dom", "es2021"],
-    "jsx": "react-jsx",
-    "strict": true,
-    "sourceMap": true,
-    "baseUrl": "./src",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
     "allowJs": true,
-    "outDir": ".erb/dll"
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": "./src",
+    "esModuleInterop": true,
+    "incremental": true,
+    "jsx": "react-jsx",
+    "lib": ["dom", "es2021"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": ".erb/dll",
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "target": "es2021"
   },
   "exclude": ["test", "release/build", "release/app/dist", ".erb/dll"]
 }

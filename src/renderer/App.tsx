@@ -1,18 +1,10 @@
-// import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState, useEffect, Dispatch, SetStateAction } from 'react';
 import { GraphiQL, GraphiQLInterface } from 'graphiql';
-import type { DocumentNode } from 'graphql';
 import {
-  useTheme,
-  ImplementsIcon,
-  GraphiQLPlugin,
   GraphiQLProvider,
   usePluginContext,
-  useExecutionContext,
   useEditorContext,
-  useQueryEditor,
   useSchemaContext,
-  useStorageContext,
 } from '@graphiql/react';
 import { useExplorerPlugin } from '@graphiql/plugin-explorer';
 import { createGraphiQLFetcher } from '@graphiql/toolkit';
@@ -41,28 +33,13 @@ const useLocalStorage = (
 };
 
 const GraphiQLInterfaceWrapper = ({
-  onEditQuery,
   setVisiblePlugin,
 }: {
-  onEditQuery(value: string, documentAST?: DocumentNode): void;
   setVisiblePlugin(value: SetStateAction<string | null>): void;
-  // setTheme(value: SetStateAction<string | null>): void;
 }) => {
-  const editorContext = useEditorContext({ nonNull: true });
-  // const executionContext = useExecutionContext({ nonNull: true });
   const pluginContext = usePluginContext();
-  // const queryEditorContext = useQueryEditor({ onEdit: onEditQuery });
+  const editorContext = useEditorContext({ nonNull: true });
   const schemaContext = useSchemaContext({ nonNull: true });
-  // const storageContext = useStorageContext();
-
-  // console.dir({
-  //   editorContext,
-  //   executionContext,
-  //   schemaContext,
-  //   pluginContext,
-  //   queryEditorContext,
-  //   storageContext,
-  // });
 
   useEffect(() => {
     const callback = (event: KeyboardEvent) => {
@@ -75,32 +52,25 @@ const GraphiQLInterfaceWrapper = ({
         } else {
           editorContext?.changeTab(editorContext.tabs.length - 1);
         }
-      }
-      if (isCommand && event.code === 'KeyR') {
+      } else if (isCommand && event.code === 'KeyR') {
         event.preventDefault();
         schemaContext.introspect();
-      }
-      if (isCommand && event.code === 'KeyD') {
+      } else if (isCommand && event.code === 'KeyD') {
         event.preventDefault();
         setVisiblePlugin('Documentation Explorer');
-      }
-      if (isCommand && event.code === 'KeyK') {
+      } else if (isCommand && event.code === 'KeyK') {
         pluginContext?.setVisiblePlugin('Documentation Explorer');
         setVisiblePlugin('Documentation Explorer');
-      }
-      if (isCommand && event.code === 'KeyY') {
+      } else if (isCommand && event.code === 'KeyY') {
         event.preventDefault();
         setVisiblePlugin('History');
-      }
-      if (isCommand && event.code === 'KeyE') {
+      } else if (isCommand && event.code === 'KeyE') {
         event.preventDefault();
         setVisiblePlugin('GraphiQL Explorer');
-      }
-      if (isCommand && event.code === 'KeyT') {
+      } else if (isCommand && event.code === 'KeyT') {
         event.preventDefault();
         editorContext?.addTab();
-      }
-      if (isCommand && event.code === 'KeyW') {
+      } else if (isCommand && event.code === 'KeyW') {
         event.preventDefault();
         editorContext?.closeTab(editorContext.activeTabIndex);
       }
@@ -122,7 +92,6 @@ const GraphiQLInterfaceWrapper = ({
 
 const GraphiQLWrapper = () => {
   const [query, setQuery] = useState('');
-  // const [theme, setTheme] = useLocalStorage('graphiql:theme');
   const [url, setURL] = useLocalStorage('graphiql-desktop:url');
   const fetcher = createGraphiQLFetcher({
     url: url ?? 'https://swapi-graphql.netlify.app/.netlify/functions/index',
@@ -134,12 +103,7 @@ const GraphiQLWrapper = () => {
   const [visiblePlugin, setVisiblePlugin] = useLocalStorage(
     'graphiql-desktop:lastVisiblePlugin'
   );
-
-  // TODO: base off of theme when useTheme properly notifies of changes
-  // const background = theme === 'light' ? '#ffffff' : '#212a3b';
-
   return (
-    // <div className="graphiql-desktop" style={{ background }}>
     <div className="graphiql-desktop">
       <input
         type="text"
@@ -158,11 +122,7 @@ const GraphiQLWrapper = () => {
           setVisiblePlugin(plugin?.title ?? '');
         }}
       >
-        <GraphiQLInterfaceWrapper
-          onEditQuery={setQuery}
-          setVisiblePlugin={setVisiblePlugin}
-          // setTheme={setTheme}
-        />
+        <GraphiQLInterfaceWrapper setVisiblePlugin={setVisiblePlugin} />
       </GraphiQLProvider>
     </div>
   );
