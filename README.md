@@ -10,7 +10,7 @@ Just head to the [releases](https://github.com/nathanchapman/graphiql-desktop/re
 
 ## Additional Features
 
-In addition to all of the features of [GraphiQL 2](https://github.com/graphql/graphiql), `graphiql-desktop` adds support for specifying the GraphQL server URL, saving the current state of the UI to local storage, and several keyboard shortcuts unique to the desktop application.
+In addition to all of the features of [GraphiQL 2](https://github.com/graphql/graphiql), `graphiql-desktop` adds support for specifying the GraphQL server URL, autosaves the current state of the UI to local storage, and adds keyboard shortcuts.
 
 ### Shortcuts
 
