@@ -2,23 +2,16 @@ name: Publish
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   publish:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [macos-latest]
+    runs-on: macos-latest
 
     steps:
-      - name: Checkout git repo
-        uses: actions/checkout@v1
+      - uses: actions/checkout@v3
 
-      - name: Install Node and NPM
-        uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
         with:
           node-version: 16
           cache: npm
@@ -29,7 +22,7 @@ jobs:
           npm run postinstall
           npm run build
 
-      - name: Publish releases
+      - name: Publish release
         env:
           # These values are used for auto updates signing
           # APPLE_ID: ${{ secrets.APPLE_ID }}
