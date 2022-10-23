@@ -1,0 +1,57 @@
+/*
+ * @NOTE: Prepend a `~` to css file paths that are in your node_modules
+ *        See https://github.com/webpack-contrib/sass-loader#imports
+ */
+
+html,
+body {
+  margin: 0;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.graphiql-desktop {
+  background: #ffffff;
+  /* height: calc(100vh - 41px); */
+  display: flex;
+  flex-flow: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* TODO: Figure out height and width for these */
+.graphiql-desktop-url-input {
+  margin: 2px 0 0px 60px;
+  width: calc(100vw - 100px);
+  height: 3rem;
+  padding: 0px 20px;
+  background: transparent;
+  font-size: 1.2rem;
+  color: rgba(59, 75, 104, 1);
+  border: none;
+  border-bottom: 1px solid rgba(59, 75, 104, 0.1);
+  overflow-x: auto;
+}
+
+.graphiql-desktop-url-input:focus {
+  outline-width: 0;
+}
+
+::placeholder {
+  color: rgba(59, 75, 104, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  .graphiql-desktop {
+    background: #212a3b;
+  }
+  .graphiql-desktop-url-input {
+    color: rgba(183, 194, 215, 0.76);
+    border: none;
+    border-bottom: 1px solid rgba(183, 194, 215, 0.1);
+  }
+  ::placeholder {
+    color: rgba(183, 194, 215, 0.76);
+  }
+}
