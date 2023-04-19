@@ -12,6 +12,8 @@ body {
 }
 
 .graphiql-desktop {
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
   background: #ffffff;
   display: flex;
   flex-flow: column;
