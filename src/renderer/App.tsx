@@ -8,6 +8,7 @@ import {
 } from '@graphiql/react';
 import { useExplorerPlugin } from '@graphiql/plugin-explorer';
 import { createGraphiQLFetcher } from '@graphiql/toolkit';
+import { DebounceInput } from 'react-debounce-input';
 
 import './App.css';
 import 'graphiql/graphiql.min.css';
@@ -16,10 +17,11 @@ import '@graphiql/plugin-explorer/dist/style.css';
 const useLocalStorage = (
   key: string,
   fallback?: string
-): [string | null, Dispatch<SetStateAction<string | null>>] => {
-  const [value, setValue] = useState(
-    localStorage.getItem(key) ?? fallback ?? null
-  );
+): [
+  typeof fallback extends undefined ? string | null : string,
+  Dispatch<SetStateAction<string | null>>
+] => {
+  const [value, setValue] = useState(localStorage.getItem(key));
 
   useEffect(() => {
     if (value) {
@@ -29,7 +31,8 @@ const useLocalStorage = (
     }
   }, [key, value]);
 
-  return [value, setValue];
+  // @ts-expect-error - this is fine
+  return [value ?? fallback ?? null, setValue];
 };
 
 const GraphiQLInterfaceWrapper = ({
@@ -91,35 +94,38 @@ const GraphiQLInterfaceWrapper = ({
 };
 
 const GraphiQLWrapper = () => {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState<string>();
   const [url, setURL] = useLocalStorage('graphiql-desktop:url');
   const fetcher = createGraphiQLFetcher({
     url: url ?? 'https://swapi-graphql.netlify.app/.netlify/functions/index',
   });
-  const explorerPlugin = useExplorerPlugin({
+  const explorer = useExplorerPlugin({
     query,
     onEdit: setQuery,
+    showAttribution: false,
   });
   const [visiblePlugin, setVisiblePlugin] = useLocalStorage(
     'graphiql-desktop:lastVisiblePlugin'
   );
   return (
     <div className="graphiql-desktop">
-      <input
+      <DebounceInput
         type="text"
         className="graphiql-desktop-url-input"
         value={url ?? undefined}
         placeholder="Endpoint URL"
+        minLength={12}
+        debounceTimeout={500}
         onChange={(e) => setURL(e.target.value)}
       />
       <GraphiQLProvider
         fetcher={fetcher}
         query={query}
-        plugins={[explorerPlugin]}
+        plugins={[explorer]}
         shouldPersistHeaders
-        visiblePlugin={visiblePlugin ?? ''}
+        visiblePlugin={visiblePlugin}
         onTogglePluginVisibility={(plugin) => {
-          setVisiblePlugin(plugin?.title ?? '');
+          setVisiblePlugin(plugin?.title ?? null);
         }}
       >
         <GraphiQLInterfaceWrapper setVisiblePlugin={setVisiblePlugin} />
