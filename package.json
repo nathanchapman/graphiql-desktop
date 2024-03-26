@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "license": "MIT",
   "description": "Electron-based desktop application for GraphiQL 2",
-  "author": "Nathan Chapman <nathanchapman@duck.com> (http://nathanchapman.io)",
+  "author": "Nathan Chapman <nathanchapman@duck.com> (https://nathanchapman.dev)",
   "repository": "github:nathanchapman/graphiql-desktop",
   "bugs": "https://github.com/nathanchapman/graphiql-desktop/issues",
   "homepage": "https://github.com/nathanchapman/graphiql-desktop#readme",
