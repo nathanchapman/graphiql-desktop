@@ -1,15 +1,15 @@
 import 'webpack-dev-server';
-import path from 'path';
-import fs from 'fs';
-import webpack from 'webpack';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
-import chalk from 'chalk';
-import { merge } from 'webpack-merge';
-import { execSync, spawn } from 'child_process';
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
+import { execSync, spawn } from 'child_process';
+import fs from 'fs';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import path from 'path';
+import webpack from 'webpack';
+import { merge } from 'webpack-merge';
+import checkNodeEnv from '../scripts/check-node-env';
+import { createGraphiQLShortKeysReplacementPlugin } from './graphiql-short-keys-plugin';
 import baseConfig from './webpack.config.base';
 import webpackPaths from './webpack.paths';
-import checkNodeEnv from '../scripts/check-node-env';
 
 // When an ESLint server is running, we can't set the NODE_ENV so we'll check if it's
 // at the dev webpack config is not accidentally run in a production environment
@@ -31,9 +31,7 @@ if (
   !(fs.existsSync(webpackPaths.dllPath) && fs.existsSync(manifest))
 ) {
   console.log(
-    chalk.black.bgYellow.bold(
-      'The DLL files are missing. Sit back while we build them for you with "npm run build-dll"'
-    )
+    'The DLL files are missing. Sit back while we build them for you with "npm run postinstall"',
   );
   execSync('npm run postinstall');
 }
@@ -64,6 +62,7 @@ const configuration: webpack.Configuration = {
     rules: [
       {
         test: /\.s?css$/,
+        sideEffects: true,
         use: [
           'style-loader',
           {
@@ -80,6 +79,7 @@ const configuration: webpack.Configuration = {
       },
       {
         test: /\.s?css$/,
+        sideEffects: true,
         use: ['style-loader', 'css-loader', 'sass-loader'],
         exclude: /\.module\.s?(c|a)ss$/,
       },
@@ -114,6 +114,9 @@ const configuration: webpack.Configuration = {
       },
     ],
   },
+  optimization: {
+    splitChunks: false,
+  },
   plugins: [
     ...(skipDLLs
       ? []
@@ -124,6 +127,8 @@ const configuration: webpack.Configuration = {
             sourceType: 'var',
           }),
         ]),
+
+    createGraphiQLShortKeysReplacementPlugin(),
 
     new webpack.NoEmitOnErrorsPlugin(),
 
@@ -186,23 +191,23 @@ const configuration: webpack.Configuration = {
         shell: true,
         stdio: 'inherit',
       })
-        .on('close', (code: number) => process.exit(code!))
+        .on('close', (code: number | null) => process.exit(code ?? 0))
         .on('error', (spawnError) => console.error(spawnError));
 
       console.log('Starting Main Process...');
       let args = ['run', 'start:main'];
       if (process.env.MAIN_ARGS) {
         args = args.concat(
-          ['--', ...process.env.MAIN_ARGS.matchAll(/"[^"]+"|[^\s"]+/g)].flat()
+          ['--', ...process.env.MAIN_ARGS.matchAll(/"[^"]+"|[^\s"]+/g)].flat(),
         );
       }
       spawn('npm', args, {
         shell: true,
         stdio: 'inherit',
       })
-        .on('close', (code: number) => {
+        .on('close', (code: number | null) => {
           preloadProcess.kill();
-          process.exit(code!);
+          process.exit(code ?? 0);
         })
         .on('error', (spawnError) => console.error(spawnError));
       return middlewares;

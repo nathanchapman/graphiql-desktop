@@ -1,5 +1,6 @@
-/* eslint global-require: off, no-console: off, promise/always-return: off */
-
+import { app, BrowserWindow, shell } from 'electron';
+import log from 'electron-log';
+import { autoUpdater } from 'electron-updater';
 /**
  * This module executes inside of electron's main process. You can start
  * electron renderer process from here and communicate with the other processes
@@ -9,13 +10,9 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
-import { autoUpdater } from 'electron-updater';
-import log from 'electron-log';
+import { buildAboutPanelOptions } from './about';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-
-import pkg from '../../package.json';
 
 class AppUpdater {
   constructor() {
@@ -27,12 +24,6 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
-});
-
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
@@ -40,10 +31,6 @@ if (process.env.NODE_ENV === 'production') {
 
 const isDebug =
   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
-
-// if (isDebug) {
-//   require('electron-debug')();
-// }
 
 const installExtensions = async () => {
   const installer = require('electron-devtools-installer');
@@ -53,7 +40,7 @@ const installExtensions = async () => {
   return installer
     .default(
       extensions.map((name) => installer[name]),
-      forceDownload
+      forceDownload,
     )
     .catch(console.log);
 };
@@ -113,15 +100,10 @@ const createWindow = async () => {
   });
 
   // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
   new AppUpdater();
 };
 
-app.setAboutPanelOptions({
-  applicationName: 'GraphiQL Desktop',
-  applicationVersion: pkg.version,
-  version: pkg.version,
-});
+app.setAboutPanelOptions(buildAboutPanelOptions());
 
 /**
  * Add event listeners...

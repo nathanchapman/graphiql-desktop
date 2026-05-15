@@ -22,6 +22,8 @@ body {
 }
 
 .graphiql-desktop-url-input {
+  -webkit-app-region: no-drag;
+  appearance: none;
   margin: 2px 0 0px 60px;
   width: calc(100vw - 100px);
   height: 3rem;
@@ -31,11 +33,33 @@ body {
   color: rgba(59, 75, 104, 1);
   border: none;
   border-bottom: 1px solid rgba(59, 75, 104, 0.1);
+  border-radius: 0;
+  box-shadow: none;
   overflow-x: auto;
 }
 
-.graphiql-desktop-url-input:focus {
-  outline-width: 0;
+.graphiql-desktop .graphiql-container,
+.graphiql-desktop a,
+.graphiql-desktop button,
+.graphiql-desktop input,
+.graphiql-desktop select,
+.graphiql-desktop textarea,
+.graphiql-desktop [role="button"],
+.graphiql-desktop [role="tab"] {
+  -webkit-app-region: no-drag;
+}
+
+.graphiql-desktop-url-input:focus,
+.graphiql-desktop-url-input:focus-visible,
+.graphiql-desktop-url-input[data-focused="true"] {
+  outline: none;
+  border-bottom-color: rgba(59, 75, 104, 0.24);
+  box-shadow: inset 0 -1px 0 rgba(59, 75, 104, 0.14);
+}
+
+.graphiql-desktop-url-input::selection {
+  color: inherit;
+  background: rgba(59, 75, 104, 0.18);
 }
 
 ::placeholder {
@@ -50,6 +74,16 @@ body {
     color: rgba(183, 194, 215, 0.76);
     border: none;
     border-bottom: 1px solid rgba(183, 194, 215, 0.1);
+  }
+  .graphiql-desktop-url-input:focus,
+  .graphiql-desktop-url-input:focus-visible,
+  .graphiql-desktop-url-input[data-focused="true"] {
+    border-bottom-color: rgba(183, 194, 215, 0.28);
+    box-shadow: inset 0 -1px 0 rgba(183, 194, 215, 0.18);
+  }
+  .graphiql-desktop-url-input::selection {
+    color: rgba(226, 232, 244, 0.95);
+    background: rgba(183, 194, 215, 0.22);
   }
   ::placeholder {
     color: rgba(183, 194, 215, 0.76);
