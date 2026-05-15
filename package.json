@@ -21,7 +21,7 @@
     "start:main": "cross-env NODE_ENV=development electronmon .erb/scripts/start-main.cjs",
     "start:preload": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.preload.dev.ts",
     "start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
-    "test": "jest src/**/*.test.tsx"
+    "test": "jest"
   },
   "dependencies": {
     "@graphiql/plugin-doc-explorer": "0.4.1",
@@ -147,7 +147,7 @@
     }
   },
   "engines": {
-    "node": ">=22.12.0",
+    "node": ">=22.22.1",
     "npm": ">=10.0.0"
   },
   "electronmon": {

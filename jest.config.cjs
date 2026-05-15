@@ -6,12 +6,13 @@ module.exports = {
       '<rootDir>/.erb/mocks/fileMock.js',
     '\\.(css|less|sass|scss)$': require.resolve('identity-obj-proxy'),
   },
-  modulePathIgnorePatterns: ['<rootDir>/release/app'],
+  modulePathIgnorePatterns: ['<rootDir>/.erb/dll', '<rootDir>/release/app'],
   testEnvironment: 'jsdom',
   testEnvironmentOptions: {
     url: 'http://localhost/',
   },
-  testPathIgnorePatterns: ['release/app/dist'],
+  testMatch: ['<rootDir>/src/**/*.test.tsx'],
+  testPathIgnorePatterns: ['<rootDir>/.erb/dll', '<rootDir>/release/app/dist'],
   transform: {
     '\\.(ts|tsx|js|jsx)$': require.resolve('ts-jest'),
   },
