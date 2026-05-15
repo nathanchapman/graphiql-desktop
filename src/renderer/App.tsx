@@ -1,25 +1,51 @@
-import { useState, useEffect, Dispatch, SetStateAction } from 'react';
-import { GraphiQL, GraphiQLInterface } from 'graphiql';
+import {
+  DOC_EXPLORER_PLUGIN,
+  DocExplorerStore,
+} from '@graphiql/plugin-doc-explorer';
+import { explorerPlugin } from '@graphiql/plugin-explorer';
+import { HISTORY_PLUGIN, HistoryStore } from '@graphiql/plugin-history';
 import {
   GraphiQLProvider,
-  usePluginContext,
-  useEditorContext,
-  useSchemaContext,
+  useGraphiQL,
+  useGraphiQLActions,
 } from '@graphiql/react';
-import { useExplorerPlugin } from '@graphiql/plugin-explorer';
 import { createGraphiQLFetcher } from '@graphiql/toolkit';
-import { DebounceInput } from 'react-debounce-input';
+import { GraphiQL, GraphiQLInterface } from 'graphiql';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 
+import 'graphiql/style.css';
+import '@graphiql/plugin-doc-explorer/style.css';
+import '@graphiql/plugin-explorer/style.css';
+import '@graphiql/plugin-history/style.css';
 import './App.css';
-import 'graphiql/graphiql.min.css';
-import '@graphiql/plugin-explorer/dist/style.css';
+
+const fallbackUrl = 'https://countries.trevorblades.com/';
+
+const normalizeEndpointUrl = (value: string) => {
+  const trimmedValue = value.trim();
+
+  if (!trimmedValue) {
+    return '';
+  }
+
+  try {
+    const endpointUrl = new URL(trimmedValue);
+    if (endpointUrl.protocol === 'http:' || endpointUrl.protocol === 'https:') {
+      return trimmedValue;
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+};
 
 const useLocalStorage = (
   key: string,
-  fallback?: string
+  fallback?: string,
 ): [
   typeof fallback extends undefined ? string | null : string,
-  Dispatch<SetStateAction<string | null>>
+  Dispatch<SetStateAction<string | null>>,
 ] => {
   const [value, setValue] = useState(localStorage.getItem(key));
 
@@ -35,104 +61,155 @@ const useLocalStorage = (
   return [value ?? fallback ?? null, setValue];
 };
 
-const GraphiQLInterfaceWrapper = ({
-  setVisiblePlugin,
+function DebouncedUrlInput({
+  value,
+  onChange,
 }: {
-  setVisiblePlugin(value: SetStateAction<string | null>): void;
-}) => {
-  const pluginContext = usePluginContext();
-  const editorContext = useEditorContext({ nonNull: true });
-  const schemaContext = useSchemaContext({ nonNull: true });
+  value: string | null;
+  onChange(nextValue: string): void;
+}) {
+  const [draftValue, setDraftValue] = useState(value ?? '');
+  const [isFocused, setIsFocused] = useState(false);
+  const hasMounted = useRef(false);
+  const isValidEndpoint = normalizeEndpointUrl(draftValue) !== null;
+
+  useEffect(() => {
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      return undefined;
+    }
+
+    const timeout = window.setTimeout(() => {
+      const endpointUrl = normalizeEndpointUrl(draftValue);
+      if (endpointUrl !== null) {
+        onChange(endpointUrl);
+      }
+    }, 500);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [draftValue, onChange]);
+
+  return (
+    <input
+      type="text"
+      className="graphiql-desktop-url-input"
+      value={draftValue}
+      placeholder="Endpoint URL"
+      minLength={12}
+      aria-invalid={!isValidEndpoint}
+      data-focused={isFocused ? 'true' : undefined}
+      onBlur={() => setIsFocused(false)}
+      onChange={(event) => setDraftValue(event.target.value)}
+      onFocus={() => setIsFocused(true)}
+    />
+  );
+}
+
+function GraphiQLInterfaceWrapper() {
+  const {
+    addTab,
+    changeTab,
+    closeTab,
+    introspect,
+    setVisiblePlugin: setGraphiQLVisiblePlugin,
+  } = useGraphiQLActions();
+  const { activeTabIndex, tabs } = useGraphiQL((state) => ({
+    activeTabIndex: state.activeTabIndex,
+    tabs: state.tabs,
+  }));
 
   useEffect(() => {
     const callback = (event: KeyboardEvent) => {
       const isCommand = event.metaKey || event.ctrlKey;
+      let handled = true;
+
       if (isCommand && event.code.startsWith('Digit')) {
-        event.preventDefault();
         const index = Number(event.key) - 1;
-        if (index >= 0 && index < editorContext.tabs.length) {
-          editorContext?.changeTab(index);
+        if (index >= 0 && index < tabs.length) {
+          changeTab(index);
         } else {
-          editorContext?.changeTab(editorContext.tabs.length - 1);
+          changeTab(tabs.length - 1);
         }
       } else if (isCommand && event.code === 'KeyR') {
-        event.preventDefault();
-        schemaContext.introspect();
+        introspect();
       } else if (isCommand && event.code === 'KeyD') {
-        event.preventDefault();
-        setVisiblePlugin('Documentation Explorer');
+        setGraphiQLVisiblePlugin('Documentation Explorer');
       } else if (isCommand && event.code === 'KeyK') {
-        pluginContext?.setVisiblePlugin('Documentation Explorer');
-        setVisiblePlugin('Documentation Explorer');
+        setGraphiQLVisiblePlugin('Documentation Explorer');
       } else if (isCommand && event.code === 'KeyY') {
-        event.preventDefault();
-        setVisiblePlugin('History');
+        setGraphiQLVisiblePlugin('History');
       } else if (isCommand && event.code === 'KeyE') {
-        event.preventDefault();
-        setVisiblePlugin('GraphiQL Explorer');
+        setGraphiQLVisiblePlugin('GraphiQL Explorer');
       } else if (isCommand && event.code === 'KeyT') {
-        event.preventDefault();
-        editorContext?.addTab();
+        addTab();
       } else if (isCommand && event.code === 'KeyW') {
+        closeTab(activeTabIndex);
+      } else {
+        handled = false;
+      }
+
+      if (handled) {
         event.preventDefault();
-        editorContext?.closeTab(editorContext.activeTabIndex);
+        event.stopPropagation();
       }
     };
-    document.addEventListener('keydown', callback);
+    document.addEventListener('keydown', callback, true);
     return () => {
-      document.removeEventListener('keydown', callback);
+      document.removeEventListener('keydown', callback, true);
     };
-  }, [pluginContext, editorContext, schemaContext, setVisiblePlugin]);
+  }, [
+    activeTabIndex,
+    addTab,
+    changeTab,
+    closeTab,
+    introspect,
+    setGraphiQLVisiblePlugin,
+    tabs,
+  ]);
 
   return (
     <GraphiQLInterface>
-      <GraphiQL.Logo>
-        <></>
-      </GraphiQL.Logo>
+      <GraphiQL.Logo>{null}</GraphiQL.Logo>
     </GraphiQLInterface>
   );
-};
+}
 
-const GraphiQLWrapper = () => {
-  const [query, setQuery] = useState<string>();
+function GraphiQLWrapper() {
   const [url, setURL] = useLocalStorage('graphiql-desktop:url');
   const fetcher = createGraphiQLFetcher({
-    url: url ?? 'https://swapi-graphql.netlify.app/.netlify/functions/index',
+    url: url?.trim() || fallbackUrl,
   });
-  const explorer = useExplorerPlugin({
-    query,
-    onEdit: setQuery,
+  const explorer = explorerPlugin({
     showAttribution: false,
   });
+  const plugins = [DOC_EXPLORER_PLUGIN, HISTORY_PLUGIN, explorer];
   const [visiblePlugin, setVisiblePlugin] = useLocalStorage(
-    'graphiql-desktop:lastVisiblePlugin'
+    'graphiql-desktop:lastVisiblePlugin',
   );
   return (
     <div className="graphiql-desktop">
-      <DebounceInput
-        type="text"
-        className="graphiql-desktop-url-input"
-        value={url ?? undefined}
-        placeholder="Endpoint URL"
-        minLength={12}
-        debounceTimeout={500}
-        onChange={(e) => setURL(e.target.value)}
-      />
+      <DebouncedUrlInput value={url} onChange={setURL} />
       <GraphiQLProvider
         fetcher={fetcher}
-        query={query}
-        plugins={[explorer]}
+        plugins={plugins}
+        referencePlugin={DOC_EXPLORER_PLUGIN}
         shouldPersistHeaders
         visiblePlugin={visiblePlugin}
         onTogglePluginVisibility={(plugin) => {
           setVisiblePlugin(plugin?.title ?? null);
         }}
       >
-        <GraphiQLInterfaceWrapper setVisiblePlugin={setVisiblePlugin} />
+        <HistoryStore>
+          <DocExplorerStore>
+            <GraphiQLInterfaceWrapper />
+          </DocExplorerStore>
+        </HistoryStore>
       </GraphiQLProvider>
     </div>
   );
-};
+}
 
 export default function App() {
   return <GraphiQLWrapper />;

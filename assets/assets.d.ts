@@ -1,7 +1,9 @@
 type Styles = Record<string, string>;
 
 declare module '*.svg' {
-  export const ReactComponent: React.FC<React.SVGProps<SVGSVGElement>>;
+  export const ReactComponent: import('react').FC<
+    import('react').SVGProps<SVGSVGElement>
+  >;
 
   const content: string;
   export default content;

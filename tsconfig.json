@@ -7,14 +7,17 @@
     "incremental": true,
     "jsx": "react-jsx",
     "lib": ["dom", "es2021"],
+    "ignoreDeprecations": "6.0",
     "module": "commonjs",
     "moduleResolution": "node",
     "outDir": ".erb/dll",
     "resolveJsonModule": true,
+    "rootDir": ".",
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "target": "es2021"
+    "target": "es2021",
+    "types": ["node", "jest"]
   },
   "exclude": ["test", "release/build", "release/app/dist", ".erb/dll"]
 }

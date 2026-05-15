@@ -1,9 +1,9 @@
 import {
   app,
-  Menu,
-  shell,
   BrowserWindow,
+  Menu,
   MenuItemConstructorOptions,
+  shell,
 } from 'electron';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
@@ -158,7 +158,7 @@ export default class MenuBuilder {
           label: 'GraphiQL Docs',
           click() {
             shell.openExternal(
-              'https://github.com/graphql/graphiql/tree/main/packages/graphiql#readme'
+              'https://github.com/graphql/graphiql/tree/main/packages/graphiql#readme',
             );
           },
         },
@@ -166,7 +166,7 @@ export default class MenuBuilder {
           label: 'GraphiQL Desktop Docs',
           click() {
             shell.openExternal(
-              'https://github.com/nathanchapman/graphiql-desktop#readme'
+              'https://github.com/nathanchapman/graphiql-desktop#readme',
             );
           },
         },
@@ -174,7 +174,7 @@ export default class MenuBuilder {
           label: 'Search Open Issues',
           click() {
             shell.openExternal(
-              'https://github.com/nathanchapman/graphiql-desktop/issues'
+              'https://github.com/nathanchapman/graphiql-desktop/issues',
             );
           },
         },
@@ -226,7 +226,7 @@ export default class MenuBuilder {
                   accelerator: 'F11',
                   click: () => {
                     this.mainWindow.setFullScreen(
-                      !this.mainWindow.isFullScreen()
+                      !this.mainWindow.isFullScreen(),
                     );
                   },
                 },
@@ -244,7 +244,7 @@ export default class MenuBuilder {
                   accelerator: 'F11',
                   click: () => {
                     this.mainWindow.setFullScreen(
-                      !this.mainWindow.isFullScreen()
+                      !this.mainWindow.isFullScreen(),
                     );
                   },
                 },
@@ -263,7 +263,7 @@ export default class MenuBuilder {
             label: 'Documentation',
             click() {
               shell.openExternal(
-                'https://github.com/electron/electron/tree/main/docs#readme'
+                'https://github.com/electron/electron/tree/main/docs#readme',
               );
             },
           },
