@@ -1,6 +1,6 @@
 # graphiql-desktop [![GitHub release](https://img.shields.io/github/v/release/nathanchapman/graphiql-desktop)](https://github.com/nathanchapman/graphiql-desktop/releases)
 
-> Electron-based desktop application for GraphiQL 2
+> Electron-based desktop application for GraphiQL
 
 ![GraphiQL Desktop](./assets/screenshot.png)
 
@@ -10,7 +10,7 @@ Just head to the [releases](https://github.com/nathanchapman/graphiql-desktop/re
 
 ## Additional Features
 
-In addition to all of the features of [GraphiQL 2](https://github.com/graphql/graphiql), `graphiql-desktop` adds support for specifying the GraphQL server URL, autosaves the current state of the UI to local storage, and adds keyboard shortcuts.
+In addition to all of the features of [GraphiQL](https://github.com/graphql/graphiql), `graphiql-desktop` adds support for specifying the GraphQL server URL, autosaves the current state of the UI to local storage, and adds keyboard shortcuts.
 
 ### Shortcuts
 
